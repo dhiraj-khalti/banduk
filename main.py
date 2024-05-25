@@ -9,19 +9,26 @@ import time
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Function to fetch contestant data
+def fetch_contestant_data(contestant_slug):
+    url = f'https://khalti.com/api/v2/vcontestant/{contestant_slug}/'
+    response = requests.get(url)
+    return response.json()
+
+# Example slug (this will be passed by the frontend)
+contestant_slug = "305DD8X"
+
 # Start the timer
 start_time = time.time()
 
 # Fetch the data from the API
-response = requests.get('https://khalti.com/api/v2/vcontest/comedy-champion-season-3/contestants/')
-data = response.json()
+data = fetch_contestant_data(contestant_slug)
 
-# Choose a contestant (for example, the first one)
-contestant = data['contestants'][4]
-name = contestant['name']
-image_url = contestant['image']
-cta_link = contestant['cta_link']
-title = data['page']['title']
+# Extract the necessary data
+name = data['name']
+image_url = data['image']
+cta_link = data['cta_link']
+title = data['contest']['name']
 
 # Fetch and compress the contestant's image
 image_response = requests.get(image_url)
@@ -99,4 +106,3 @@ vote_image.save('final_vote_image.png')
 end_time = time.time()
 time_taken = end_time - start_time
 logger.info(f"Time taken to generate the image: {time_taken:.2f} seconds")
-
