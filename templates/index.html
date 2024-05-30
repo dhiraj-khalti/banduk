@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Vote Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #output {
+            margin-top: 20px;
+        }
+        /* Styles for the popup */
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .popup img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        /* Blur background when popup is active */
+        .blur {
+        
+        }
+        /* Ensure image is not blurred */
+        .popup-content {
+            position: relative;
+            z-index: 1;
+        }
+        /* Background overlay */
+        .popup-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Vote Image</h1>
+    <input type="text" id="contestantSlug" placeholder="Enter contestant slug" />
+    <button onclick="generateImage()">Generate Image</button>
+    <div id="output"></div>
+
+    <div class="popup" id="popup" onclick="hidePopup()">
+        <div class="popup-background"></div>
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <img id="popupImage" src="" alt="Vote Image">
+        </div>
+    </div>
+
+    <script>
+        async function generateImage() {
+            const slug = document.getElementById('contestantSlug').value;
+            const outputDiv = document.getElementById('output');
+
+            if (!slug) {
+                outputDiv.innerHTML = 'Please enter a contestant slug.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/voting/generate/${slug}`, {
+                    method: 'POST',
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.json();
+                    throw new Error(errorMessage.error);
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+
+                showPopup(url);
+            } catch (error) {
+                console.error('Error:', error);
+                outputDiv.innerHTML = `Failed to generate vote image. Please try again. Error: ${error.message}`;
+            }
+        }
+
+        function showPopup(imageUrl) {
+            const popup = document.getElementById('popup');
+            const popupImage = document.getElementById('popupImage');
+            popupImage.src = imageUrl;
+            document.body.classList.add('blur');
+            popup.style.display = 'flex';
+        }
+
+        function hidePopup() {
+            const popup = document.getElementById('popup');
+            popup.style.display = 'none';
+            document.body.classList.remove('blur');
+        }
+    </script>
+</body>
+</html>
