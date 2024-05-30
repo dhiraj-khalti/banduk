@@ -36,7 +36,7 @@
         }
         /* Blur background when popup is active */
         .blur {
-            filter: blur(5px);
+            filter: blur(0px);
         }
         /* Ensure image is not blurred */
         .popup-content {
@@ -79,7 +79,7 @@
             }
 
             try {
-                const response = await fetch(`/voting/${slug}`, {
+                const response = await fetch(`/voting/generate/${slug}`, {
                     method: 'POST',
                 });
 

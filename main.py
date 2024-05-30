@@ -7,20 +7,22 @@ import logging
 import time
 from dotenv import load_dotenv
 import os
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 import sentry_sdk
-from flask import Flask
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Configure Sentry
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN"),
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
     enable_tracing=True,
 )
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
